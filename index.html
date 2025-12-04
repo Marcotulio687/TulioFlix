@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TulioFlix</title>
+
+  <!-- Fonte Moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: "Poppins", sans-serif;
+      overflow-x: hidden;
+    }
+
+    header {
+     width: 100%;
+     padding: 20px 40px;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0));
+     position: absolute;
+     top: 0;
+     z-index: 50;
+     box-sizing: border-box; /* evita ultrapassar a largura da tela */
+}
+
+    #logo { color: red; font-weight:700; cursor: pointer; margin:0; }
+
+    header input {
+     width: 280px;
+     max-width: 60vw;        /* evita sair da tela */
+     padding: 10px;
+     border-radius: 6px;
+     border: none;
+     outline: none;
+     font-size: 15px;
+     background: #2b2b2b;    /* cinza */
+     color: white;           /* texto branco */
+}
+    /* CARROSSEL */
+    #hero {
+      width: 100%;
+      height: 520px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 0;
+    }
+
+    #hero img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     transform: scale(1.1);          /* Evita bordas visíveis após o blur */
+     filter: blur(12px) brightness(55%) saturate(120%);
+     transition: opacity 0.5s ease;
+}
+
+
+    #hero .info {
+      position: absolute;
+      bottom: 80px;
+      left: 50px;
+      max-width: 600px;
+      z-index: 5;
+    }
+
+    #hero .info h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    #hero .info p {
+      font-size: 18px;
+      opacity: 0.95;
+      max-width: 700px;
+    }
+
+    /* FILAS */
+    .genre-row {
+      margin-top: 40px;
+      padding: 0 40px;
+    }
+
+    .genre-row h2 {
+      margin-bottom: 12px;
+    }
+
+    .movies-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .movie-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      padding-bottom: 20px;
+      width: 100%;
+      padding-top: 8px;
+    }
+
+
+
+    .arrow {
+      position: absolute;
+      top: 40%;
+      font-size: 36px;
+      cursor: pointer;
+      z-index: 30;
+      opacity: 0.85;
+      transition: 0.2s;
+      width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(0,0,0,0.45);
+    }
+
+    .arrow:hover { opacity: 1; transform: scale(1.03); }
+
+    .left { left: -6px; }
+    .right { right: -6px; }
+
+    /* CARDS */
+    .movie-card {
+      min-width: 180px;
+      height: 260px;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+      position: relative;
+      background: #111;
+      display:flex;align-items:center;justify-content:center;
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 22px rgba(231, 0, 0, 0.45), 0 0 14px rgba(231,0,0,0.15) inset;
+    }
+
+    /* brilho vermelho em volta */
+    .movie-card::after{
+      content: '';
+      position: absolute; inset: 0; border-radius:6px; pointer-events:none; box-shadow: 0 0 0 2px transparent;
+      transition: box-shadow .2s;
+    }
+    .movie-card:hover::after{ box-shadow: 0 0 20px 6px rgba(231,0,0,0.14); }
+
+    /* MODAL */
+    #modal-bg {
+      display: none;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modal {
+      width: 80%;
+      background: #111;
+      padding: 24px;
+      border-radius: 10px;
+      display: flex;
+      gap: 20px;
+      align-items:flex-start;
+    }
+
+    #modal img { width: 280px; border-radius: 8px; flex:0 0 280px }
+    #modal .meta { flex:1 }
+    #modal .meta h2{ margin:0 0 8px }
+    #modal .meta p{ color: #ddd }
+    #modal .buttons{ margin-top:12px }
+    .btn { padding:10px 16px; border-radius:6px; border:none; cursor:pointer; font-weight:600 }
+    .btn.play{ background: #e50914; color:#fff }
+    .btn.list{ background: rgba(255,255,255,0.08); color:#fff; margin-left:8px }
+
+    /* Ajuste para resultados de busca (não ficar atrás do header) */
+    #searchResults .genre-row { margin-top: 120px !important; padding: 0 40px }
+    #searchResults .movies-container{ position:relative }
+
+    @media (max-width:900px){
+      #hero{height:380px}
+      #hero .info h1{font-size:28px}
+      #modal{width:90%;flex-direction:column}
+      #modal img{width:100%}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1 id="logo">TULIOFLIX</h1>
+  <input id="searchInput" type="text" placeholder="Buscar filmes..." />
+</header>
+
+<div id="hero">
+  <img id="hero-img" src="" alt="" />
+  <div class="info">
+    <h1 id="hero-title"></h1>
+    <p id="hero-desc"></p>
+  </div>
+</div>
+
+<div id="catalog"></div>
+<div id="searchResults" style="display:none;"></div>
+
+<!-- MODAL -->
+<div id="modal-bg" onclick="closeModal()">
+  <div id="modal" onclick="event.stopPropagation()">
+    <img id="modal-img" />
+    <div class="meta">
+      <h2 id="modal-title"></h2>
+      <p id="modal-plot"></p>
+      <p id="modal-info"></p>
+      <div class="buttons">
+        <button class="btn play">▶ Assistir</button>
+        <button class="btn list">+ Minha Lista</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_KEY = "37030909";
+
+  /* Catálogo revisado e organizado por gênero (filmes apropriados a cada gênero, sem duplicatas) */
+  const genres = {
+    "Ação": [
+      "tt0848228","tt4154796","tt3896198","tt0468569","tt0499549",
+      "tt4154756","tt2015381","tt2911666","tt1631867","tt3501632",
+      "tt2250912","tt3501632","tt0371746","tt0458339","tt1285016",
+      "tt1431045","tt0974015","tt0137523","tt0110413","tt0120915"
+    ],
+    "Comédia": [
+      "tt0107048","tt0110912","tt0118715","tt0120338","tt0109830",
+      "tt1037705","tt1482459","tt2709768","tt2582802","tt0102926",
+      "tt0363163","tt2267998","tt0290002","tt2527336","tt0114709"
+    ],
+    "Drama": [
+      "tt0111161","tt0108052","tt0120689","tt0816692","tt0172495",
+      "tt0169547","tt0109831","tt0469494","tt0268978","tt1324999",
+      "tt1659337","tt3748172","tt0133093","tt0482571","tt0102926",
+      "tt0110357","tt0396171","tt0109830","tt0892769","tt0118799"
+    ],
+    "Ficção Científica": [
+      "tt1375666","tt0083658","tt1853728","tt2488496","tt0088763",
+      "tt0120915","tt0133093","tt0062622","tt0499549","tt0816692",
+      "tt0121765","tt1454468","tt2543164","tt0369610","tt0133093",
+      "tt0120737","tt0107290","tt3148266","tt1798709","tt1700845"
+    ],
+    "Terror": [
+      "tt1457767","tt0435625","tt0081505","tt0078748","tt1179904",
+      "tt0102926","tt7784604","tt2345737","tt3387520","tt1386697",
+      "tt7808566","tt5639446","tt1190080","tt0840361","tt1979320"
+    ]
+  };
+
+  const catalogDiv = document.getElementById("catalog");
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+  const logo = document.getElementById("logo");
+
+  async function fetchMovie(id){
+    try{
+      const res = await fetch(`https://www.omdbapi.com/?i=${id}&apikey=${API_KEY}`);
+      const data = await res.json();
+      if(!data || data.Response === "False"){
+        return {
+          Title: "Título indisponível",
+          Poster: "https://via.placeholder.com/300x450?text=Sem+Imagem",
+          Plot: "Sinopse não disponível.",
+          Year: "-",
+          Runtime: "-",
+          imdbRating: "-",
+          Genre: "-",
+          Director: "-",
+          Actors: "-"
+        };
+      }
+      return data;
+    }catch(err){
+      console.error('fetchMovie error', err);
+      return {
+        Title: "Título indisponível",
+        Poster: "https://via.placeholder.com/300x450?text=Sem+Imagem",
+        Plot: "Sinopse não disponível.",
+        Year: "-",
+        Runtime: "-",
+        imdbRating: "-",
+        Genre: "-",
+        Director: "-",
+        Actors: "-"
+      };
+    }
+  }
+
+  async function loadCatalog(){
+    catalogDiv.innerHTML = '';
+    for(const genreName in genres){
+      const row = document.createElement("div");
+      row.className = "genre-row";
+
+      row.innerHTML = `<h2>${genreName}</h2>
+      <div class='movies-container'>
+        <span class='arrow left' onclick='scrollLeft(this)'>&lt;</span>
+        <div class='movie-list'></div>
+        <span class='arrow right' onclick='scrollRight(this)'>&gt;</span>
+      </div>`;
+
+      const listDiv = row.querySelector(".movie-list");
+
+      for (const movieId of genres[genreName]){
+        const data = await fetchMovie(movieId);
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        const poster = (data.Poster && data.Poster !== 'N/A') ? data.Poster : 'https://via.placeholder.com/300x450?text=Sem+Imagem';
+        card.innerHTML = `<img src='${poster}' alt='${data.Title}' />`;
+        card.onclick = () => openModal(data);
+        listDiv.appendChild(card);
+      }
+
+      catalogDiv.appendChild(row);
+    }
+  }
+
+  function scrollLeft(el){
+    el.parentElement.querySelector('.movie-list').scrollLeft -= 400;
+  }
+
+  function scrollRight(el){
+    el.parentElement.querySelector('.movie-list').scrollLeft += 400;
+  }
+
+  /* MODAL */
+  function openModal(data){
+    document.getElementById("modal-bg").style.display = "flex";
+    document.getElementById("modal-img").src = (data.Poster && data.Poster !== 'N/A') ? data.Poster : 'https://via.placeholder.com/300x450?text=Sem+Imagem';
+    document.getElementById("modal-title").innerText = data.Title;
+    document.getElementById("modal-plot").innerText = data.Plot;
+    document.getElementById("modal-info").innerText = `${data.Year} | ${data.Runtime} | IMDb ${data.imdbRating}`;
+  }
+
+  function closeModal(){
+    document.getElementById("modal-bg").style.display = "none";
+  }
+
+  /* BUSCA */
+  function showCatalog(){
+    document.getElementById("hero").style.display = "block";
+    catalogDiv.style.display = "block";
+    searchResults.style.display = "none";
+  }
+
+  function showSearchOnly(){
+    document.getElementById("hero").style.display = "none";
+    catalogDiv.style.display = "none";
+    searchResults.style.display = "block";
+  }
+
+  /* ENTER → MOSTRA APENAS OS RESULTADOS */
+  searchInput.addEventListener("keypress", async (e) => {
+    if(e.key === "Enter"){
+      const q = searchInput.value.trim();
+      if(!q) return;
+
+      const res = await fetch(`https://www.omdbapi.com/?s=${q}&apikey=${API_KEY}`);
+      const json = await res.json();
+
+      showSearchOnly();
+
+      if(json.Search){
+        renderSearch(json.Search);
+      } else {
+        searchResults.innerHTML = `<div class='genre-row'><h2>Resultados da Busca</h2><p style="color:#bbb">Nenhum resultado encontrado.</p></div>`;
+      }
+    }
+  });
+
+  /* APAGOU O CAMPO = VOLTA AO CATÁLOGO */
+  searchInput.addEventListener("input", () => {
+    if(searchInput.value.trim() === ""){
+      showCatalog();
+    }
+  });
+
+  /* CLICAR NO LOGO = VOLTA AO CATÁLOGO */
+  logo.addEventListener("click", () => {
+    searchInput.value = "";
+    showCatalog();
+  });
+
+  function renderSearch(results){
+    searchResults.innerHTML =
+      `<div class='genre-row'>
+         <h2>Resultados da Busca</h2>
+
+         <div class='movies-container'>
+           <span class='arrow left' onclick='scrollLeft(this)'>&lt;</span>
+           <div class='movie-list'></div>
+           <span class='arrow right' onclick='scrollRight(this)'>&gt;</span>
+         </div>
+
+       </div>`;
+
+    const list = searchResults.querySelector('.movie-list');
+
+    results.forEach(r => {
+      const poster = (r.Poster && r.Poster !== 'N/A') ? r.Poster : 'https://via.placeholder.com/300x450?text=Sem+Imagem';
+      const card = document.createElement("div");
+      card.className = "movie-card";
+      card.innerHTML = `<img src='${poster}' alt='${r.Title}' />`;
+      card.onclick = async () => openModal(await fetchMovie(r.imdbID));
+      list.appendChild(card);
+    });
+  }
+
+  /* HERO CARROSSEL */
+  async function loadHero(){
+    const actionIds = genres["Ação"].slice(0,6);
+    let idx = 0;
+    async function update(){
+      const id = actionIds[idx % actionIds.length];
+      const data = await fetchMovie(id);
+      const poster = (data.Poster && data.Poster !== 'N/A') ? data.Poster : 'https://via.placeholder.com/1200x700?text=Sem+Imagem';
+      document.getElementById("hero-img").src = poster;
+      document.getElementById("hero-title").innerText = data.Title;
+      document.getElementById("hero-desc").innerText = data.Plot;
+      idx++;
+    }
+    await update();
+    setInterval(update, 6000);
+  }
+
+  loadHero();
+  loadCatalog();
+</script>
+
+</body>
+</html>
