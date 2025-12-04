@@ -1,7 +1,3 @@
-Aqui está um **README.md** profissional, organizado e explicando o funcionamento do seu projeto **TulioFlix**, com foco no HTML, CSS e JavaScript utilizados.
-
----
-
 # 📺 TulioFlix — Catálogo de Filmes com OMDb API
 
 TulioFlix é um projeto inspirado no design da Netflix, desenvolvido em **HTML**, **CSS** e **JavaScript**, que consome a **OMDb API** para listar filmes, exibir catálogos por gênero, permitir buscas e abrir detalhes em um **modal interativo**.
