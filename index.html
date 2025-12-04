@@ -180,7 +180,24 @@
       display: flex;
       gap: 20px;
       align-items:flex-start;
+
+      
     }
+    footer {
+     width: 100%;
+     text-align: center;
+     padding: 25px 0;
+     margin-top: 60px;
+     background: #050505;
+     color: #888;
+     font-size: 14px;
+     border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+footer p {
+  margin: 0;
+}
+
 
     #modal img { width: 280px; border-radius: 8px; flex:0 0 280px }
     #modal .meta { flex:1 }
@@ -342,7 +359,7 @@
   }
 
   function scrollLeft(el){
-    el.parentElement.querySelector('.movie-list').scrollLeft -= 400;
+    el.parentElement.querySelector('.movie-list').scrollRight -= 400;
   }
 
   function scrollRight(el){
@@ -453,8 +470,16 @@
   loadCatalog();
 </script>
 
+.
+</script>
+
+<footer>
+  <p>© 2025 TulioFlix — Desenvolvido por Marco Túlio Ferreira Soares</p>
+</footer>
+
 </body>
 </html>
 
 
-
+</body>
+</html>
